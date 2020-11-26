@@ -17,4 +17,4 @@ COPY . /code/
 RUN mkdir static
 RUN python manage.py collectstatic --noinput
 
-CMD [ "gunicorn", "app.wsgi:application", "--access-logfile", "-", "--error-logfile", "-" ]
+CMD [ "gunicorn", "server.wsgi:application", "--access-logfile", "-", "--error-logfile", "-" ]
