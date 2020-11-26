@@ -1,4 +1,4 @@
-{% load i18n bootstrap4 %}
+{% load i18n bootstrap4 static %}
 
 <!doctype html>
 <html lang="en">
@@ -11,6 +11,8 @@
 
     {% block javascript %}
     {% endblock %}
+
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
     <title>{% block title %}{% trans "Crypto Informant" %}{% endblock %}</title>
 </head>
