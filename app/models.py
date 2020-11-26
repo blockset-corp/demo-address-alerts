@@ -1,4 +1,5 @@
 import uuid
+import json
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -55,7 +56,8 @@ class WebhookData(models.Model):
 
     def send_email(self):
         context = {
-            'webhook': self
+            'webhook': self,
+            'json_pretty': json.dumps(self.body, sort_keys=True, indent=4)
         }
         send_mail(
             subject=render_to_string('emails/alert_subject.html', context=context),
