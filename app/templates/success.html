@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block title %}{{ block.super }} | {% trans 'Create Alert' %}{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <div class="mx-auto mb-3" style="max-width: 600px;">
+            <h2>{% trans 'Success!' %}</h2>
+            <p>
+                {% blocktrans %}
+                    Your alert has been created. Please check your email to activate it.
+                {% endblocktrans %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

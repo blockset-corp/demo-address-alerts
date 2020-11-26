@@ -1,0 +1,9 @@
+An alert has been created for this email for the following addresses:
+{% for address in alert.addresses %}
+   * {{ address }}
+{% endfor %}
+Please follow this link to confirm this alert:
+
+{{ confirm_url }}
+
+Thanks!

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load i18n bootstrap4 %}
+
+{% block javascript %}
+    {{ blockchains|json_script:"blockchains-data" }}
+    <script>
+        let counter = 0;
+
+        function removeAlertRow(num) {
+            $('#alert-row-' + num).remove();
+        }
+
+        function addAlertRow(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            let blockchains = JSON.parse(document.getElementById('blockchains-data').textContent);
+            let number = counter += 1;
+            let blockchainOptions = '';
+            for (let blockchain of blockchains) {
+                blockchainOptions = blockchainOptions + `<option value="${blockchain['id']}">${blockchain['name']}</option>`;
+            }
+            let template = `
+                <div class="form-row" id="alert-row-${number}">
+                    <div class="form-group col-md-5">
+                        <label for="blockchain-select-${number}">Blockchain</label>
+                        <select id="blockchain-select-${number}" name="blockchain-${number}" class="custom-select" required>
+                            <option selected>Choose Blockchain</option>
+                            ${blockchainOptions}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-7">
+                        <label for="address-input-${number}">Address</label>
+                        <div class="input-group">
+                            <input type="text" name="address-${number}" id="address-input-${number}" class="form-control" placeholder="alert address" required>
+                            <div class="input-group-append">
+                                <button onclick="removeAlertRow('${number}')" class="btn btn-outline-secondary">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            $('#alert-rows').append($.parseHTML(template));
+        }
+
+        function submitAlert(event) {
+            event.preventDefault();
+
+            let addresses = [];
+
+            $('#alert-rows div.form-row').each(function() {
+                let blockchainId = $(this).find('select').val();
+                let address = $(this).find('input').val();
+
+                addresses.push(blockchainId + ':' + address);
+            });
+
+            $('input[name=addresses]').val(JSON.stringify(addresses));
+
+            $(this).unbind('submit').submit();
+        }
+
+        $(function () {
+            addAlertRow();
+            $('#add-address-btn').click(addAlertRow);
+            $('#alert-form').submit(submitAlert);
+        });
+    </script>
+{% endblock %}
+
+{% block title %}{{ block.super }} | {% trans 'Create Alert' %}{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <div class="mx-auto mb-3" style="max-width: 600px;">
+            <h2>{% trans 'Create Alert' %}</h2>
+            <p class="text-muted">
+                {% blocktrans %}
+                    Input your email and some blockchain addresses below
+                    to be notified whenever a transaction is sent or received from
+                    the chosen addresses.
+                {% endblocktrans %}
+            </p>
+            <form action="{% url 'alert_create' %}" method="post" class="form" id="alert-form">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div id="alert-rows" class="mb-3"></div>
+                {% buttons %}
+                    <button id="add-address-btn"
+                            class="btn btn-block btn-outline-secondary">{% trans 'Add Address' %}</button>
+                    <button type="submit" class="btn btn-block btn-primary">{% trans 'Create Alert' %}</button>
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
