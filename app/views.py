@@ -7,6 +7,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 from .models import Alert, WebhookData
 from .forms import AlertCreateForm
 from .blockset import get_blockchains
@@ -61,5 +62,16 @@ class WebhookView(DetailView):
         hook_data = json.loads(request.body.decode('utf-8'))
         webhook = WebhookData(alert=instance, body=hook_data)
         webhook.save()
-        webhook.send_email()
+        webhook.send_email(request)
         return HttpResponse(status=204)
+
+
+class WebhookDetailView(DetailView):
+    template_name = 'webhook.html'
+
+    def get_object(self, queryset=None):
+        alert = get_object_or_404(Alert, pk=self.kwargs['alertpk'])
+        if str(alert.token) != self.request.GET.get('token', ''):
+            raise Http404(_('Alert not found'))
+        webhook = get_object_or_404(WebhookData, alert=alert, pk=self.kwargs['webhookpk'])
+        return webhook

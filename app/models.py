@@ -33,7 +33,6 @@ class Alert(models.Model):
         self.active = True
         url = request.build_absolute_uri(reverse_lazy('alert_webhook', kwargs={'pk': self.id})) + f'?token={self.token}'
         subscription = create_subscription(url, self.addresses)
-        print(f'subscription {subscription}')
         self.subscription_id = subscription['subscription_id']
         self.save()
 
@@ -54,10 +53,14 @@ class WebhookData(models.Model):
     def __str__(self):
         return str(self.alert)
 
-    def send_email(self):
+    def send_email(self, request):
         context = {
             'webhook': self,
-            'json_pretty': json.dumps(self.body, sort_keys=True, indent=4)
+            'json_pretty': json.dumps(self.body, sort_keys=True, indent=4),
+            'url': request.build_absolute_uri(reverse_lazy('alert_webhook_detail', kwargs={
+                'alertpk': self.alert.pk,
+                'webhookpk': self.pk
+            })) + f'?token={self.alert.token}'
         }
         send_mail(
             subject=render_to_string('emails/alert_subject.html', context=context),

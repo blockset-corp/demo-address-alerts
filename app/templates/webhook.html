@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'vendor/jquery.json-viewer.css' %}">
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script src="{% static 'vendor/jquery.json-viewer.js' %}"></script>
+    {{ object.body|json_script:"webhook-body" }}
+    <script>
+        $(function () {
+            let webhookBody = JSON.parse(document.getElementById('webhook-body').textContent);
+            $('#json-renderer').jsonViewer(webhookBody);
+        });
+    </script>
+{% endblock %}
+
+{% block title %}{{ block.super }} | {% trans 'Address Alerts' %}{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h3>{% trans "Webhook" %}</h3>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{% trans "Received" %}</strong>
+                <span>{{ object.received|date }} {{ object.received|time }} UTC</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{% trans "Transaction ID" %}</strong>
+                <span>{{ object.body.identifier }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{% trans "Status" %}</strong>
+                <span class="badge badge-pill {% if object.body.status == 'confirmed' %}badge-success{% else %}badge-warning{% endif %}">{{ object.body.status }}</span>
+            </li>
+            {% if object.body.confirmations > 0 %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{% trans "Confirmations" %}</strong>
+                <span class="badge badge-pill badge-secondary">{{ object.body.confirmations }}</span>
+            </li>
+            {% endif %}
+        </ul>
+        <h5 class="mt-4">{% trans 'Raw Data' %}</h5>
+        <pre id="json-renderer"></pre>
+    </div>
+{% endblock %}

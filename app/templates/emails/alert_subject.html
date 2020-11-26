@@ -1,1 +1,1 @@
-Transaction activity detected
+{% if webhook.body.status == 'confirmed' %}Transaction has {{ webhook.body.confirations }} confirmation{{ webhook.body.confirmations|pluralize }}{% else %}New transaction detected{% endif %}
