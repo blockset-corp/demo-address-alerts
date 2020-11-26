@@ -48,6 +48,19 @@ class ConfirmView(DetailView):
         return resp
 
 
+class DeactivateView(DetailView):
+    template_name = 'deactivate.html'
+    queryset = Alert.objects.filter()
+
+    def get(self, request, *args, **kwargs):
+        resp = super().get(request, *args, **kwargs)
+        if str(self.object.token) != request.GET.get('token', ''):
+            raise Http404(_('Alert not found'))
+        if self.object.active:
+            self.object.deactivate()
+        return resp
+
+
 class WebhookView(DetailView):
     queryset = Alert.objects.filter()
 
@@ -57,7 +70,7 @@ class WebhookView(DetailView):
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
-        if str(instance.token) != request.GET.get('token', ''):
+        if str(instance.token) != request.GET.get('token', '') or not instance.active:
             raise Http404(_('Alert not found'))
         hook_data = json.loads(request.body.decode('utf-8'))
         webhook = WebhookData(alert=instance, body=hook_data)

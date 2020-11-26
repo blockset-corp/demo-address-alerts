@@ -1,10 +1,14 @@
 {% if webhook.body.status == 'submitted' %}New Transaction{% else %}Transaction Confirmed{% endif %}
 
-Event Time:      {{ webhook.received|time }} UTC
-Confirmations:   {{ webhook.body.confirmations }}
-Transaction ID:  {{ webhook.body.identifier }}
-Status:          {{ webhook.body.status }}
+Event Time: {{ webhook.received|time }} UTC
+Confirmations: {{ webhook.body.confirmations }}
+Transaction ID: {{ webhook.body.identifier }}
+Status: {{ webhook.body.status }}
 
 View this webhook in a browser:
 
 {{ url }}
+
+Disable this alert:
+
+{{ deactivate_url }}

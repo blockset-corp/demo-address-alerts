@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block title %}{{ block.super }} | {% trans 'Address Alerts' %}{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <div class="mx-auto mb-3" style="max-width: 600px;">
+            <h2>{% trans 'Alert Deactivated' %}</h2>
+            <p>
+                {% blocktrans %}
+                    Your alert has been deactivated. You will no longer receive alerts
+                    for the following addresses:
+                {% endblocktrans %}
+            </p>
+            <p>
+            <ul>
+                {% for addr in object.addresses %}
+                    <li>{{ addr }}</li>
+                {% endfor %}
+            </ul>
+            </p>
+        </div>
+    </div>
+{% endblock %}

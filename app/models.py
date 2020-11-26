@@ -36,6 +36,15 @@ class Alert(models.Model):
         self.subscription_id = subscription['subscription_id']
         self.save()
 
+    def deactivate(self):
+        self.active = False
+        try:
+            delete_subscription(self.subscription_id)
+        except Exception as e:
+            print(f'error deleting subscription {e}')
+        self.subscription_id = ''
+        self.save()
+
 
 class WebhookData(models.Model):
     alert = models.ForeignKey(Alert, on_delete=models.CASCADE)
@@ -60,6 +69,9 @@ class WebhookData(models.Model):
             'url': request.build_absolute_uri(reverse_lazy('alert_webhook_detail', kwargs={
                 'alertpk': self.alert.pk,
                 'webhookpk': self.pk
+            })) + f'?token={self.alert.token}',
+            'deactivate_url': request.build_absolute_uri(reverse_lazy('alert_deactivate', kwargs={
+                'pk': self.alert.pk
             })) + f'?token={self.alert.token}'
         }
         send_mail(
